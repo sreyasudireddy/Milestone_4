@@ -2,16 +2,18 @@ library(shiny)
 library(tidyverse)
 library(ggthemes)
 
-
+# Wrangle Covid data
 covid <- read_csv("data/covid_stats.csv") %>%
     filter(!state %in% c("AS", "PR", "GU", "VI", "MP")) 
 
 state.names <- c(covid$state[1:51])
 column.names <- c("Deaths" = "death", "New Tests" = "test", "New Positive Cases" = "positive")
 
+# Wrangle Social distancing data
 social_distancing <- read_csv("data/social_distancing.csv", skip = 2) %>%
     select(!Footnotes) %>%
-    slice(-(53:92))
+    slice(c(-1, -(53:92)))
+view(social_distancing)
 
 ######################################################################################
 ######################################################################################
@@ -68,8 +70,8 @@ server <- function(input, output, session) {
                input$selected_state)
     })
     
-    output$summary <- renderPrint({
-        print(social_distancing)
+    output$summary <- renderTable({
+       summary(social_distancing)
     })
     
     
