@@ -9,7 +9,9 @@ covid <- read_csv("data/covid_stats.csv") %>%
 state.names <- c(covid$state[1:51])
 column.names <- c("Deaths" = "death", "New Tests" = "test", "New Positive Cases" = "positive")
 
-social_distancing <- read_csv("data/social_distancing.csv", skip = 2)
+social_distancing <- read_csv("data/social_distancing.csv", skip = 2) %>%
+    select(!Footnotes) %>%
+    slice(-(53:92))
 
 ######################################################################################
 ######################################################################################
@@ -17,7 +19,7 @@ social_distancing <- read_csv("data/social_distancing.csv", skip = 2)
 ui <- navbarPage(
     "Social Distancing Policies and COVID-19 State Data",
     tabPanel(
-        "Main",
+        "COVID-19 Data by State",
         fluidPage(
             titlePanel("COVID-19 Data by State"),
             sidebarLayout(
@@ -44,6 +46,14 @@ ui <- navbarPage(
         ),
         
     ),
+    tabPanel("Social Distancing",
+             fluidPage(
+                 titlePanel("Social Distancing Data"),
+                 mainPanel(dataTableOutput("summary")
+                           )
+             )
+             ),
+    
     tabPanel("About",
              h3("About Me"),
              p("My name is Sreya Sudireddy. I am a senior at Harvard College studying Economics with a secondary in Global Health and Health Policy."),
@@ -52,20 +62,16 @@ ui <- navbarPage(
 )
 
 server <- function(input, output, session) {
-    # - Then, you use these named objects to update the data on your site via the input object.
-    #
-    #   -- render() functions are what show content that will change live on your site.
-    #
-    #   -- so here, renderText() is updating live text based on your choice.
+    
     output$state_message <- renderText({
-        paste0("State: ", # this is just a string, so it will never change
-               input$selected_state)       # this is based on your input, selected_state defined above.
+        paste0("State: ",
+               input$selected_state)
     })
     
-    # output$text_message <- renderText({
-    #   paste0("This is the label you typed: ", # this is just a string, so it will never change
-    #          input$entered_text, "!")       # this is based on your input, selected_state defined above.
-    # })
+    output$summary <- renderPrint({
+        print(social_distancing)
+    })
+    
     
     output$covid_death <- renderPlot({
         covid %>%
