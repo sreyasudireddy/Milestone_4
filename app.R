@@ -1,6 +1,7 @@
 library(shiny) 
 library(tidyverse)
 library(ggthemes)
+library(DT)
 
 # Wrangle Covid data
 covid <- read_csv("data/covid_stats.csv") %>%
@@ -51,7 +52,7 @@ ui <- navbarPage(
     tabPanel("Social Distancing",
              fluidPage(
                  titlePanel("Social Distancing Data"),
-                 mainPanel(dataTableOutput("summary")
+                 mainPanel(DT::dataTableOutput("summary")
                            )
              )
              ),
@@ -70,8 +71,8 @@ server <- function(input, output, session) {
                input$selected_state)
     })
     
-    output$summary <- renderTable({
-       summary(social_distancing)
+    output$summary = DT::renderDataTable({
+       social_distancing
     })
     
     
