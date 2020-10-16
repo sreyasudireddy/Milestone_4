@@ -61,7 +61,11 @@ ui <- navbarPage(
              h3("About Me"),
              p("My name is Sreya Sudireddy. I am a senior at Harvard College studying Economics with a secondary in Global Health and Health Policy."),
              h3("About my Project"),
-             p("I did this project because..."))
+             p("I did this project because..."),
+             h3("Progress"),
+             p()
+    )
+            
 )
 
 server <- function(input, output, session) {
