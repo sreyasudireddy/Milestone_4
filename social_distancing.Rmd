@@ -1,0 +1,30 @@
+---
+title: "Social Distancing Data"
+author: "Sreya Sudireddy"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+social_distancing <- read_csv("data/social_distancing.csv", skip = 2,
+                              col_type = cols(Location = col_character(),
+                                              `Status of Reopening` = col_character(),
+                                              `Stay at Home Order` = col_character(),
+                                              `Mandatory Quarantine for Travelers` = col_character(),
+                                              `Non-Essential Business Closures` = col_character(),
+                                              `Large Gatherings Ban` = col_character(),
+                                              `Restaurant Limits` = col_character(),
+                                              `Bar Closures` = col_character(),
+                                              `Face Covering Requirement` = col_character(),
+                                              `Emergency Declaration` = col_character(),
+                                              Footnotes = col_character())) %>%
+    select(!Footnotes) %>%
+    slice(c(-1, -(53:92)))
+
+saveRDS(social_distancing, file = "socialdistancing")
+```
+

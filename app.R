@@ -2,50 +2,65 @@ library(shiny)
 library(tidyverse)
 library(ggthemes)
 library(DT)
+library(shinythemes)
 
-# Wrangle Covid data
-covid <- read_csv("data/covid_stats.csv") %>%
-    filter(!state %in% c("AS", "PR", "GU", "VI", "MP")) 
+#Reading in covid data
 
-state.names <- c(covid$state[1:51])
-column.names <- c("Deaths" = "death", "New Tests" = "test", "New Positive Cases" = "positive")
+covid <- readRDS("coviddata.RDS")
 
 # Wrangle Social distancing data
-social_distancing <- read_csv("data/social_distancing.csv", skip = 2) %>%
+social_distancing <- read_csv("data/social_distancing.csv", skip = 2,
+                              col_type = cols(Location = col_character(),
+                                              `Status of Reopening` = col_character(),
+                                              `Stay at Home Order` = col_character(),
+                                              `Mandatory Quarantine for Travelers` = col_character(),
+                                              `Non-Essential Business Closures` = col_character(),
+                                              `Large Gatherings Ban` = col_character(),
+                                              `Restaurant Limits` = col_character(),
+                                              `Bar Closures` = col_character(),
+                                              `Face Covering Requirement` = col_character(),
+                                              `Emergency Declaration` = col_character(),
+                                              Footnotes = col_character())) %>%
     select(!Footnotes) %>%
     slice(c(-1, -(53:92)))
-view(social_distancing)
+
+# making objects
+state.names <- c(covid$state[1:51])
+column.names <- c("Deaths" = "deaths", "Positive Cases" = "cases", "New Tests" = "test")
+
 
 ######################################################################################
 ######################################################################################
 
 ui <- navbarPage(
     "Social Distancing Policies and COVID-19 State Data",
-    tabPanel(
-        "COVID-19 Data by State",
+    theme = shinytheme("journal"),
+    tabPanel("COVID-19 Data by State",
         fluidPage(
             titlePanel("COVID-19 Data by State"),
+            p("This page allows you to view different COVID-19 statistics for each state"),
             sidebarLayout(
                 sidebarPanel(
                     selectInput(
                         inputId = "selected_state",                 # a name for the value you choose here
-                        label = "Select a State to view COVID-19 data",   # the name to display on the slider
-                        choices = state.names                       # your list of choices to choose from
-                    ),
+                        label = "Select a State",   # the name to display on the slider
+                        choices = c(state.names)                       # your list of choices to choose from
+                               ),
                     
                     radioButtons(
                         inputId = "selected_variable",             # a name for the value you choose here
                         label = "Choose a variable!",              # the label to display above the buttons
                         choices = column.names     # the button values to choose from
-                    )),
+                                )
+                             ),
                 mainPanel(
                     textOutput("state_message"),              # load a text object called "state_message"
                     # textOutput("text_message"),
                     plotOutput("covid_death"),
-                    plotOutput("covid_testing"),
-                    plotOutput("covid_positive")
-                )
-            )
+                    plotOutput("covid_positive"),
+                   plotOutput("covid_testing")
+                         )
+                        )
         ),
         
     ),
@@ -73,6 +88,7 @@ ui <- navbarPage(
 
 server <- function(input, output, session) {
     
+    
     output$state_message <- renderText({
         paste0("State: ",
                input$selected_state)
@@ -82,13 +98,13 @@ server <- function(input, output, session) {
        social_distancing
     })
     
-    
+ #death graph   
     output$covid_death <- renderPlot({
         covid %>%
             filter(state == input$selected_state) %>%
             group_by(state) %>%
             
-            ggplot(aes(x = date, y = death)) +
+            ggplot(aes(x = date, y = deaths)) +
             geom_line(color = "blue") +
             labs(title = "COVID-19 Related Deaths",
                  x = "Date",
@@ -96,6 +112,21 @@ server <- function(input, output, session) {
             theme_classic()
     })
     
+   #positve case graph 
+    output$covid_positive <- renderPlot({
+        covid %>%
+            filter(state == input$selected_state) %>%
+            group_by(state) %>%
+            
+            ggplot(aes(x = date, y = cases)) +
+            geom_line(color = "purple") +
+            labs(title = "COVID-19 New Positive Cases",
+                 x = "Date",
+                 y = "Number of New Positive Cases") +
+            theme_classic()
+    })
+    
+  # testing graph 
     output$covid_testing <- renderPlot({
         covid %>%
             filter(state == input$selected_state) %>%
@@ -106,19 +137,6 @@ server <- function(input, output, session) {
             labs(title = "COVID-19 New Daily Tests",
                  x = "Date",
                  y = "Number of New Tests") +
-            theme_classic()
-    })
-    
-    output$covid_positive <- renderPlot({
-        covid %>%
-            filter(state == input$selected_state) %>%
-            group_by(state) %>%
-            
-            ggplot(aes(x = date, y = positiveIncrease)) +
-            geom_line(color = "purple") +
-            labs(title = "COVID-19 New Positive Cases",
-                 x = "Date",
-                 y = "Number of New Positive Cases") +
             theme_classic()
     })
     
