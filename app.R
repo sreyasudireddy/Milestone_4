@@ -50,7 +50,7 @@ ui <- navbarPage(
                     
                     radioButtons(
                         inputId = "selected_variable",             # a name for the value you choose here
-                        label = "Choose a variable!",              # the label to display above the buttons
+                        label = "Choose a variable",              # the label to display above the buttons
                         choices = column.names, # the button values to choose from
                         selected = "deaths"
                                 )
@@ -58,9 +58,6 @@ ui <- navbarPage(
                 mainPanel(
                     textOutput("state_message"),              # load a text object called "state_message"
                     # textOutput("text_message"),
-                   #  plotOutput("covid_death"),
-                   #  plotOutput("covid_positive"),
-                   # plotOutput("covid_testing")
                    plotOutput("covid_stats_by_state")
                          )
                         )
@@ -76,7 +73,7 @@ ui <- navbarPage(
              ),
     
      tabPanel("About",
-              titlePanel("About"),
+             #  titlePanel("About"),
              #    includeHTML("about.html")
              # ))
 
@@ -92,11 +89,11 @@ ui <- navbarPage(
 server <- function(input, output, session) {
     
     
-    # output$state_message <- renderText({
-    #     paste0("State: ",
-    #            input$selected_state,
-    #           )
-    # })
+    output$state_message <- renderText({
+        paste0("State: "
+               #input$selected_state,
+              )
+    })
     
     output$summary = DT::renderDataTable({
        social_distancing
@@ -105,14 +102,12 @@ server <- function(input, output, session) {
  #death graph
   output$covid_stats_by_state <- renderPlot({
     if(input$selected_variable == "deaths") {
-    
-    # output$covid_death <- renderPlot({
         covid %>%
             filter(state == input$selected_state) %>%
             group_by(state) %>%
             
             ggplot(aes(x = date, y = deaths)) +
-            geom_line(color = "blue") +
+            geom_line(color = "#ef476f", size = 1) +
             labs(title = "COVID-19 Related Deaths",
                  x = "Date",
                  y = "Number of Total Deaths") +
@@ -120,14 +115,13 @@ server <- function(input, output, session) {
     }
     
    #positve case graph 
-    #output$covid_positive <- renderPlot({
     else if (input$selected_variable == "cases") {
         covid %>%
             filter(state == input$selected_state) %>%
             group_by(state) %>%
             
             ggplot(aes(x = date, y = cases)) +
-            geom_line(color = "purple") +
+            geom_line(color = "#edae49", size = 1) +
             labs(title = "COVID-19 Total Cases",
                  x = "Date",
                  y = "Number of Total Cases") +
@@ -135,14 +129,13 @@ server <- function(input, output, session) {
     }
     
   # testing graph 
-   # output$covid_testing <- renderPlot({
     else if (input$selected_variable == "totalTestResultsIncrease") {
         covid %>%
             filter(state == input$selected_state) %>%
             group_by(state) %>%
              
             ggplot(aes(x = date, y = totalTestResultsIncrease)) +
-            geom_line(color = "red") +
+            geom_line(color = "#00798c", size = 1) +
             labs(title = "COVID-19 New Daily Tests",
                  x = "Date",
                  y = "Number of New Tests") +
