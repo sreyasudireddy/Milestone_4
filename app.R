@@ -73,9 +73,8 @@ ui <- navbarPage(
              ),
     
      tabPanel("About",
-             #  titlePanel("About"),
-             #    includeHTML("about.html")
-             # ))
+     #            includeHTML("about.html")
+     #         ))
 
              h3("About my Project"),
              p("My project is on the effect of COVID-19 state social distancing policies on various outcomes such as positive test rate, deaths, and new administered tests. I chose this project because the pandemic is extremely relevant in the world right now and there is currently disparities in how different states have been handling social distancing policies. I got my data on state social distancing policies from the Kaiser Family Foundation (https://www.kff.org/coronavirus-covid-19/issue-brief/state-data-and-policy-actions-to-address-coronavirus/). This data is updated regularly to reflect updated policies. I got data on COVID-19 stats from The COVID Tracking Project (https://covidtracking.com/) and The New York Times. This data set provides various metrics on COVID-19 for every state and is also updated daily as new information comes in. For my final project, I plan on using the most updated data sets to reflect the current situation."),
