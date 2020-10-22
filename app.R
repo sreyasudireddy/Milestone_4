@@ -26,7 +26,7 @@ social_distancing <- read_csv("data/social_distancing.csv", skip = 2,
 
 # making objects
 state.names <- c(covid$state[1:51])
-column.names <- c("Deaths" = "deaths", "Positive Cases" = "cases", "New Tests" = "test")
+column.names <- c("Deaths" = "deaths", "Positive Cases" = "cases", "New Tests" = "totalTestResultsIncrease")
 
 
 ######################################################################################
@@ -44,21 +44,24 @@ ui <- navbarPage(
                     selectInput(
                         inputId = "selected_state",                 # a name for the value you choose here
                         label = "Select a State",   # the name to display on the slider
-                        choices = c(state.names)                       # your list of choices to choose from
+                        choices = c(state.names),                       # your list of choices to choose from
+                        selected = "Massachusetts"
                                ),
                     
                     radioButtons(
                         inputId = "selected_variable",             # a name for the value you choose here
                         label = "Choose a variable!",              # the label to display above the buttons
-                        choices = column.names     # the button values to choose from
+                        choices = column.names, # the button values to choose from
+                        selected = "deaths"
                                 )
                              ),
                 mainPanel(
                     textOutput("state_message"),              # load a text object called "state_message"
                     # textOutput("text_message"),
-                    plotOutput("covid_death"),
-                    plotOutput("covid_positive"),
-                   plotOutput("covid_testing")
+                   #  plotOutput("covid_death"),
+                   #  plotOutput("covid_positive"),
+                   # plotOutput("covid_testing")
+                   plotOutput("covid_stats_by_state")
                          )
                         )
         ),
@@ -89,17 +92,21 @@ ui <- navbarPage(
 server <- function(input, output, session) {
     
     
-    output$state_message <- renderText({
-        paste0("State: ",
-               input$selected_state)
-    })
+    # output$state_message <- renderText({
+    #     paste0("State: ",
+    #            input$selected_state,
+    #           )
+    # })
     
     output$summary = DT::renderDataTable({
        social_distancing
     })
     
- #death graph   
-    output$covid_death <- renderPlot({
+ #death graph
+  output$covid_stats_by_state <- renderPlot({
+    if(input$selected_variable == "deaths") {
+    
+    # output$covid_death <- renderPlot({
         covid %>%
             filter(state == input$selected_state) %>%
             group_by(state) %>%
@@ -110,36 +117,39 @@ server <- function(input, output, session) {
                  x = "Date",
                  y = "Number of Total Deaths") +
             theme_classic()
-    })
+    }
     
    #positve case graph 
-    output$covid_positive <- renderPlot({
+    #output$covid_positive <- renderPlot({
+    else if (input$selected_variable == "cases") {
         covid %>%
             filter(state == input$selected_state) %>%
             group_by(state) %>%
             
             ggplot(aes(x = date, y = cases)) +
             geom_line(color = "purple") +
-            labs(title = "COVID-19 New Positive Cases",
+            labs(title = "COVID-19 Total Cases",
                  x = "Date",
-                 y = "Number of New Positive Cases") +
+                 y = "Number of Total Cases") +
             theme_classic()
-    })
+    }
     
   # testing graph 
-    output$covid_testing <- renderPlot({
+   # output$covid_testing <- renderPlot({
+    else if (input$selected_variable == "totalTestResultsIncrease") {
         covid %>%
             filter(state == input$selected_state) %>%
             group_by(state) %>%
-            
+             
             ggplot(aes(x = date, y = totalTestResultsIncrease)) +
             geom_line(color = "red") +
             labs(title = "COVID-19 New Daily Tests",
                  x = "Date",
                  y = "Number of New Tests") +
             theme_classic()
-    })
+    }
     
     
+})
 }
 shinyApp(ui, server)
