@@ -3,30 +3,31 @@ library(tidyverse)
 library(ggthemes)
 library(DT)
 library(shinythemes)
+library(usmap)
 
 #Reading in covid data
 
 covid <- readRDS("coviddata.RDS")
 
-# Wrangle Social distancing data
-social_distancing <- read_csv("data/social_distancing.csv", skip = 2,
-                              col_type = cols(Location = col_character(),
-                                              `Status of Reopening` = col_character(),
-                                              `Stay at Home Order` = col_character(),
-                                              `Mandatory Quarantine for Travelers` = col_character(),
-                                              `Non-Essential Business Closures` = col_character(),
-                                              `Large Gatherings Ban` = col_character(),
-                                              `Restaurant Limits` = col_character(),
-                                              `Bar Closures` = col_character(),
-                                              `Face Covering Requirement` = col_character(),
-                                              `Emergency Declaration` = col_character(),
-                                              Footnotes = col_character())) %>%
-    select(!Footnotes) %>%
-    slice(c(-1, -(53:92)))
+# Reading in social distancing data
+social_distancing <- readRDS("socialdistancing.RDS")
 
-# making objects
+#creating policy tibble with renamed columns and statepop fips to create maps
+map_policy <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+  rename(reopening_status = `Status of Reopening`) %>%
+  rename(restaurant_limits = `Restaurant Limits`) %>%
+  rename(gathering_ban = `Large Gatherings Ban`) %>%
+  rename(mask_req = `Face Covering Requirement`) %>%
+  select(fips, reopening_status, restaurant_limits, gathering_ban, mask_req)
+
+
+# making objects for selector tools
 state.names <- c(covid$state[1:51])
 column.names <- c("Deaths" = "deaths", "Positive Cases" = "cases", "New Tests" = "totalTestResultsIncrease")
+policy.names <- c("Status of Reopening" = "reopening_status", 
+                  "Restaurant Bans" = "restaurant_limits", 
+                  "Large Gathering Bans" = "gathering_ban", 
+                  "Face Covering Requirement" = "mask_req")
 
 
 ######################################################################################
@@ -67,22 +68,27 @@ ui <- navbarPage(
     tabPanel("Social Distancing",
              fluidPage(
                  titlePanel("Social Distancing Data"),
-                 mainPanel(DT::dataTableOutput("summary")
+                 sidebarLayout(
+                   sidebarPanel(
+                     selectInput(
+                       inputId = "selected_policy",
+                       label = "Select a Policy",
+                       choices = c(policy.names),
+                       selected = "Status of Reopening"
+                     )
+                   ),
+                 mainPanel(plotOutput("status_map"),
+                           plotOutput("restaurant_map"),
+                           plotOutput("gathering_map"),
+                           plotOutput("mask_req"),
+                           plotOutput("policy_maps")
                            )
-             )
+                 )
+             ),
              ),
     
      tabPanel("About",
-     #            includeHTML("about.html")
-     #         ))
-
-             h3("About my Project"),
-             p("My project is on the effect of COVID-19 state social distancing policies on various outcomes such as positive test rate, deaths, and new administered tests. I chose this project because the pandemic is extremely relevant in the world right now and there is currently disparities in how different states have been handling social distancing policies. I got my data on state social distancing policies from the Kaiser Family Foundation (https://www.kff.org/coronavirus-covid-19/issue-brief/state-data-and-policy-actions-to-address-coronavirus/). This data is updated regularly to reflect updated policies. I got data on COVID-19 stats from The COVID Tracking Project (https://covidtracking.com/) and The New York Times. This data set provides various metrics on COVID-19 for every state and is also updated daily as new information comes in. For my final project, I plan on using the most updated data sets to reflect the current situation."),
-             h3("Progress"),
-              p("This week, I created a separate Rmd file for the COVID stats data. I downloaded an additional data set from The New York Times to avoid the negative number issue for deaths and number of positive cases. I still have that issue for the number of tests in each state since I could not find that data elsewhere. Over the next few weeks, I will try to examine the issue in the data. My guess is that the value is zero and it defaulted to a negative number. With Ishan's help I was able to make the radio buttons work and now the graph changes with each state and variable (yay!). I also changed the colors to some of my favorite colors. I also changed the theme to make things look more aesthetic. I would also still like to figure out a way to show the different data points on the graphs when you toggle over it. Additionally, rather than a table for social distancing policies, I would like to create maps to make things more visually aesthetic and easier to compare between states. Eventually, I will also need to figure out a model."),
-              h3("About Me"),
-              p("My name is Sreya Sudireddy. I am a senior at Harvard College studying Economics with a secondary in Global Health and Health Policy.
- The URL to my Github Repo is here: https://github.com/sreyasudireddy/Milestone_4")
+                includeHTML(rmarkdown::render("about.Rmd"))
              ))
 
 
@@ -90,14 +96,61 @@ server <- function(input, output, session) {
     
     
     output$state_message <- renderText({
-        paste0("State: "
-               #input$selected_state,
+        paste0("State: ",
+               input$selected_state
               )
     })
     
-    output$summary = DT::renderDataTable({
-       social_distancing
+    # output$status_map <- renderPlot({
+    #   plot_usmap(data = map_policy, values = "reopening_status") +
+    #     theme(legend.position = "bottom") +
+    #     # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+    #     labs(title = "Current Status of Reopening",
+    #          caption = "Source: Kaiser Family Foundation")
+    # })
+ 
+  # status of reopening map   
+    output$policy_maps <- renderPlot({
+      if(input$selected_policy == "reopening_status") {
+      plot_usmap(data = map_policy, values = "reopening_status") +
+        theme(legend.position = "bottom") +
+        # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+        labs(title = "Current Status of Reopening",
+             caption = "Source: Kaiser Family Foundation")
+      }
+  
+  # restaurant limits map
+     else if (input$selected_policy == "restaurant_limits") { 
+      plot_usmap(data = map_policy, values = "restaurant_limits") +
+        theme(legend.position = "bottom") +
+        scale_fill_manual(name = "Policy", 
+                          labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), 
+                          values = c("#98E2C6", "#BFEDEF", "#BBC6CE", "#C4B7CB")) +
+        labs(title = "Current Restaurant Limit Policies",
+             caption = "Source: Kaiser Family Foundation")
+     }
+      
+  # large gathering ban map  
+    else if (input$selected_policy == "gathering_ban") {
+      plot_usmap(data = map_policy, values = "gathering_ban") +
+        theme(legend.position = "bottom") +
+        scale_fill_manual(name = "Policy", 
+                          labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), 
+                          values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+        labs(title = "Current Large Gathering Ban Policies",
+             caption = "Source: Kaiser Family Foundation")
+    }
+      
+ # mask requirement map   
+    else if (input$selected_policy == "mask_req") {
+      plot_usmap(data = map_policy, values = "mask_req") +
+        theme(legend.position = "bottom") +
+        # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+        labs(title = "Current Face Covering Requirements",
+             caption = "Source: Kaiser Family Foundation")
+    }
     })
+    
     
  #death graph
   output$covid_stats_by_state <- renderPlot({

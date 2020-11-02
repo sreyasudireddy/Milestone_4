@@ -1,5 +1,5 @@
 ---
-output: html_document
+output: html_fragment
 ---
 
 ```{r setup, include=FALSE}
@@ -17,3 +17,5 @@ My project is on the effect of COVID-19 state social distancing policies on vari
 
 ## Progress
 This week, I created a separate Rmd file for the COVID stats data. I downloaded an additional data set from The New York Times to avoid the negative number issue for deaths and number of positive cases. I still have that issue for the number of tests in each state since I could not find that data elsewhere. Over the next few weeks, I will try to examine the issue in the data. My guess is that the value is zero and it defaulted to a negative number. With Ishan's help I was able to make the radio buttons work and now the graph changes with each state and variable (yay!). I also changed the colors to some of my favorite colors. I also changed the theme to make things look more aesthetic. I would also still like to figure out a way to show the different data points on the graphs when you toggle over it. Additionally, rather than a table for social distancing policies, I would like to create maps to make things more visually aesthetic and easier to compare between states. Eventually, I will also need to figure out a model. 
+
+
