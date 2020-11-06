@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## About Me
 My name is Sreya Sudireddy. I am a senior at Harvard College studying Economics with a secondary in Global Health and Health Policy. 
-The URL to my Github Repo is here: https://github.com/sreyasudireddy/Milestone_4
+The URL to my Github Repo is here: https://github.com/sreyasudireddy/social-distancing-covid-stats
 
 
 ## About my Project
