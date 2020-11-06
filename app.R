@@ -77,14 +77,11 @@ ui <- navbarPage(
                        selected = "Status of Reopening"
                      )
                    ),
-                 mainPanel(plotOutput("status_map"),
-                           plotOutput("restaurant_map"),
-                           plotOutput("gathering_map"),
-                           plotOutput("mask_req"),
-                           plotOutput("policy_maps")
+                 mainPanel(
+                   plotOutput("policy_maps")
                            )
                  )
-             ),
+             )
              ),
     
      tabPanel("About",
@@ -101,51 +98,48 @@ server <- function(input, output, session) {
               )
     })
     
-    # output$status_map <- renderPlot({
-    #   plot_usmap(data = map_policy, values = "reopening_status") +
-    #     theme(legend.position = "bottom") +
-    #     # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
-    #     labs(title = "Current Status of Reopening",
-    #          caption = "Source: Kaiser Family Foundation")
-    # })
  
   # status of reopening map   
     output$policy_maps <- renderPlot({
       if(input$selected_policy == "reopening_status") {
-      plot_usmap(data = map_policy, values = "reopening_status") +
-        theme(legend.position = "bottom") +
-        # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
-        labs(title = "Current Status of Reopening",
-             caption = "Source: Kaiser Family Foundation")
+        plot_usmap(data = map_reopening, values = "reopening_status") +
+          theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain")) +
+          scale_fill_manual(name = "Policy", 
+                            labels = c("New Restrictions Imposed", "Paused", "Proceeding with Reopening", "Reopened"), 
+                            values = c("#8ECAE6", "#023047", "#219EBC", "#FFB703")) +
+          labs(title = "Current Status of Reopening",
+               caption = "Source: Kaiser Family Foundation")
       }
   
   # restaurant limits map
      else if (input$selected_policy == "restaurant_limits") { 
-      plot_usmap(data = map_policy, values = "restaurant_limits") +
-        theme(legend.position = "bottom") +
-        scale_fill_manual(name = "Policy", 
-                          labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), 
-                          values = c("#98E2C6", "#BFEDEF", "#BBC6CE", "#C4B7CB")) +
-        labs(title = "Current Restaurant Limit Policies",
-             caption = "Source: Kaiser Family Foundation")
+       plot_usmap(data = map_restaurant, values = "restaurant_limits") +
+         theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain" )) +
+         scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
+         labs(title = "Current Restaurant Limit Policies",
+              caption = "Source: Kaiser Family Foundation")
      }
       
   # large gathering ban map  
     else if (input$selected_policy == "gathering_ban") {
-      plot_usmap(data = map_policy, values = "gathering_ban") +
-        theme(legend.position = "bottom") +
+      plot_usmap(data = map_gathering, values = "gathering_ban") +
+        theme(legend.position = "bottom", plot.title = element_text(size = 15,
+                                                                    face = "plain")) +
         scale_fill_manual(name = "Policy", 
-                          labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), 
-                          values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+                          labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#FB8500", "#FE5F55", "#023047", "#FFB703", "#219EBC", "#E73462", "#8ECAE6")) +
         labs(title = "Current Large Gathering Ban Policies",
              caption = "Source: Kaiser Family Foundation")
     }
       
  # mask requirement map   
     else if (input$selected_policy == "mask_req") {
-      plot_usmap(data = map_policy, values = "mask_req") +
-        theme(legend.position = "bottom") +
-        # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+      plot_usmap(data = map_masks, values = "mask_req") +
+        theme(legend.position = "bottom", 
+              legend.direction = "horizontal", 
+              plot.title = element_text(size = 15, face = "plain"), 
+              legend.title = element_text(size = 10), 
+              legend.text = element_text(size = 6)) +
+        scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
         labs(title = "Current Face Covering Requirements",
              caption = "Source: Kaiser Family Foundation")
     }

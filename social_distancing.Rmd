@@ -40,8 +40,8 @@ saveRDS(social_distancing, file = "socialdistancing.RDS")
   select(fips, restaurant_limits)
 
 plot_usmap(data = map_restaurant, values = "restaurant_limits") +
-  theme(legend.position = "bottom") +
-  scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#98E2C6", "#BFEDEF", "#BBC6CE", "#C4B7CB")) +
+  theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain" )) +
+  scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
   labs(title = "Current Restaurant Limit Policies",
        caption = "Source: Kaiser Family Foundation")
 
@@ -54,8 +54,9 @@ plot_usmap(data = map_restaurant, values = "restaurant_limits") +
   select(fips, gathering_ban)
 
 plot_usmap(data = map_gathering, values = "gathering_ban") +
-  theme(legend.position = "bottom") +
-  scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+  theme(legend.position = "bottom", plot.title = element_text(size = 15,
+                                                              face = "plain")) +
+  scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#FB8500", "#FE5F55", "#023047", "#FFB703", "#219EBC", "#E73462", "#8ECAE6")) +
   labs(title = "Current Large Gathering Ban Policies",
        caption = "Source: Kaiser Family Foundation")
 
@@ -67,8 +68,12 @@ plot_usmap(data = map_gathering, values = "gathering_ban") +
   select(fips, mask_req)
 
 plot_usmap(data = map_masks, values = "mask_req") +
-  theme(legend.position = "bottom") +
- # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+  theme(legend.position = "bottom", 
+        legend.direction = "horizontal", 
+        plot.title = element_text(size = 15, face = "plain"), 
+        legend.title = element_text(size = 10), 
+        legend.text = element_text(size = 6)) +
+  scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
   labs(title = "Current Face Covering Requirements",
        caption = "Source: Kaiser Family Foundation")
 ```
@@ -78,8 +83,10 @@ plot_usmap(data = map_masks, values = "mask_req") +
   select(fips, reopening_status)
 
 plot_usmap(data = map_reopening, values = "reopening_status") +
-  theme(legend.position = "bottom") +
-  # scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#03045E", "#069E3D", "#7D70BA", "#FFCB47", "#DEC1FF", "#B91372", "#5CC8FF")) +
+  theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain")) +
+  scale_fill_manual(name = "Policy", 
+                          labels = c("New Restrictions Imposed", "Paused", "Proceeding with Reopening", "Reopened"), 
+                           values = c("#8ECAE6", "#023047", "#219EBC", "#FFB703")) +
   labs(title = "Current Status of Reopening",
        caption = "Source: Kaiser Family Foundation")
 
