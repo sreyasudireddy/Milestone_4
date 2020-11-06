@@ -102,7 +102,7 @@ server <- function(input, output, session) {
   # status of reopening map   
     output$policy_maps <- renderPlot({
       if(input$selected_policy == "reopening_status") {
-        plot_usmap(data = map_reopening, values = "reopening_status") +
+        plot_usmap(data = map_policy, values = "reopening_status") +
           theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain")) +
           scale_fill_manual(name = "Policy", 
                             labels = c("New Restrictions Imposed", "Paused", "Proceeding with Reopening", "Reopened"), 
@@ -113,7 +113,7 @@ server <- function(input, output, session) {
   
   # restaurant limits map
      else if (input$selected_policy == "restaurant_limits") { 
-       plot_usmap(data = map_restaurant, values = "restaurant_limits") +
+       plot_usmap(data = map_policy, values = "restaurant_limits") +
          theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain" )) +
          scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
          labs(title = "Current Restaurant Limit Policies",
@@ -122,7 +122,7 @@ server <- function(input, output, session) {
       
   # large gathering ban map  
     else if (input$selected_policy == "gathering_ban") {
-      plot_usmap(data = map_gathering, values = "gathering_ban") +
+      plot_usmap(data = map_policy, values = "gathering_ban") +
         theme(legend.position = "bottom", plot.title = element_text(size = 15,
                                                                     face = "plain")) +
         scale_fill_manual(name = "Policy", 
@@ -133,7 +133,7 @@ server <- function(input, output, session) {
       
  # mask requirement map   
     else if (input$selected_policy == "mask_req") {
-      plot_usmap(data = map_masks, values = "mask_req") +
+      plot_usmap(data = map_policy, values = "mask_req") +
         theme(legend.position = "bottom", 
               legend.direction = "horizontal", 
               plot.title = element_text(size = 15, face = "plain"), 
