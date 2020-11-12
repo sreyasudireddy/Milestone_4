@@ -73,7 +73,7 @@ plot_usmap(data = map_masks, values = "mask_req") +
         plot.title = element_text(size = 15, face = "plain"), 
         legend.title = element_text(size = 10), 
         legend.text = element_text(size = 6)) +
-  scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
+   scale_fill_manual(name = "Policy", labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public", "Required for General Public"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
   labs(title = "Current Face Covering Requirements",
        caption = "Source: Kaiser Family Foundation")
 ```

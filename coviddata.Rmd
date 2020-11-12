@@ -12,11 +12,11 @@ library(openintro)
 ```
 
 ```{r}
-covid_tracking <- read_csv("data/covid_10_20.csv") %>%
+covid_tracking <- read_csv("data/covid_11_12.csv") %>%
     filter(!state %in% c("AS", "PR", "GU", "VI", "MP")) %>%
   mutate(state = abbr2state(state))
 
-nyt_covid <- read_csv("data/us-states.csv") %>%
+nyt_covid <- read_csv("data/us-states_11_12.csv") %>%
     arrange(desc(date)) %>%
     filter(!fips %in% c(69, 72, 78, 66))
 
@@ -24,5 +24,19 @@ covid_dta <- inner_join(nyt_covid, covid_tracking, by = c("date", "state")) %>%
   select(date, state, cases, deaths, positiveIncrease, totalTestResults, totalTestResultsIncrease, positive)
 
 saveRDS(covid_dta, file = "coviddata.RDS")
+```
+
+```{r}
+ 
+covid_dta %>%
+  filter(state == "Massachusetts") %>%
+  mutate(positiveIncrease = replace(positiveIncrease, which(positiveIncrease < 0), 0)) %>%
+
+ggplot(aes(x = date, y = positiveIncrease)) +
+            geom_line(color = "#edae49", size = 1) +
+            labs(title = "COVID-19 Total Cases",
+                 x = "Date",
+                 y = "Number of Total Cases") +
+            theme_classic()
 ```
 

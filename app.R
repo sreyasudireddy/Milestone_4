@@ -7,7 +7,9 @@ library(usmap)
 
 #Reading in covid data
 
-covid <- readRDS("coviddata.RDS")
+covid <- readRDS("coviddata.RDS") %>%
+  mutate(positiveIncrease = replace(positiveIncrease, which(positiveIncrease < 0), 0)) %>%
+  mutate(totalTestResultsIncrease = replace(totalTestResultsIncrease, which(totalTestResultsIncrease < 0), 0))
 
 # Reading in social distancing data
 social_distancing <- readRDS("socialdistancing.RDS")
@@ -23,7 +25,11 @@ map_policy <- inner_join(social_distancing, statepop, by = c("Location" = "full"
 
 # making objects for selector tools
 state.names <- c(covid$state[1:51])
-column.names <- c("Deaths" = "deaths", "Positive Cases" = "cases", "New Tests" = "totalTestResultsIncrease")
+column.names <- c("Deaths" = "deaths", 
+                  "Total Positive Cases" = "cases", 
+                  "New Tests" = "totalTestResultsIncrease", 
+                  "New Positive Cases" = "positiveIncrease")
+
 policy.names <- c("Status of Reopening" = "reopening_status", 
                   "Restaurant Bans" = "restaurant_limits", 
                   "Large Gathering Bans" = "gathering_ban", 
@@ -50,14 +56,14 @@ ui <- navbarPage(
                                ),
                     
                     radioButtons(
-                        inputId = "selected_variable",             # a name for the value you choose here
-                        label = "Choose a variable",              # the label to display above the buttons
-                        choices = column.names, # the button values to choose from
+                        inputId = "selected_variable",             
+                        label = "Choose a variable",              
+                        choices = column.names, 
                         selected = "deaths"
                                 )
                              ),
                 mainPanel(
-                    textOutput("state_message"),              # load a text object called "state_message"
+                    textOutput("state_message"),              
                     # textOutput("text_message"),
                    plotOutput("covid_stats_by_state")
                          )
@@ -139,7 +145,9 @@ server <- function(input, output, session) {
               plot.title = element_text(size = 15, face = "plain"), 
               legend.title = element_text(size = 10), 
               legend.text = element_text(size = 6)) +
-        scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
+        scale_fill_manual(name = "Policy", 
+                          labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public", "Required for General Public"), 
+                          values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) + 
         labs(title = "Current Face Covering Requirements",
              caption = "Source: Kaiser Family Foundation")
     }
@@ -161,7 +169,7 @@ server <- function(input, output, session) {
             theme_classic()
     }
     
-   #positve case graph 
+   #positive case graph 
     else if (input$selected_variable == "cases") {
         covid %>%
             filter(state == input$selected_state) %>%
@@ -187,6 +195,20 @@ server <- function(input, output, session) {
                  x = "Date",
                  y = "Number of New Tests") +
             theme_classic()
+    }
+  
+    # positive Increase graph
+    else if(input$selected_variable == "positiveIncrease") {
+      covid %>%
+        filter(state == input$selected_state) %>%
+        group_by(state) %>%
+        
+        ggplot(aes(x = date, y = positiveIncrease)) +
+        geom_line(color = "purple", size = 1) +
+        labs(title = "COVID-19 New Daily Positive Cases",
+             x = "Date",
+             y = "Number of New Daily Positive Cases") +
+        theme_classic()
     }
     
     
