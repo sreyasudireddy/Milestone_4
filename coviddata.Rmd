@@ -33,10 +33,12 @@ covid_dta %>%
   mutate(positiveIncrease = replace(positiveIncrease, which(positiveIncrease < 0), 0)) %>%
 
 ggplot(aes(x = date, y = positiveIncrease)) +
-            geom_line(color = "#edae49", size = 1) +
-            labs(title = "COVID-19 Total Cases",
-                 x = "Date",
-                 y = "Number of Total Cases") +
-            theme_classic()
+    geom_line(color = "#edae49", size = 1) +
+    labs(title = "COVID-19 Total Cases",
+         x = "Date",
+         y = "Number of Total Cases") +
+  scale_y_continuous(label = scales::comma) +
+  scale_x_date(date_breaks = "month", date_labels = "%b") +
+    theme_classic()
 ```
 
