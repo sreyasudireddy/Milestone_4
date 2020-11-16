@@ -13,7 +13,7 @@ covid <- readRDS("coviddata.RDS") %>%
   #mutate(totalTestResultsIncrease = replace(totalTestResultsIncrease, which(totalTestResultsIncrease < 0), 0))
 
 # Reading in social distancing data
-social_distancing <- readRDS("socialdistancing.RDS")
+social_distancing <- readRDS("socialdistancing_11_15.RDS")
 
 #creating policy tibble with renamed columns and statepop fips to create maps
 map_policy <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
@@ -27,9 +27,10 @@ map_policy <- inner_join(social_distancing, statepop, by = c("Location" = "full"
 # making objects for selector tools
 state.names <- c(covid$state[1:51])
 column.names <- c("Deaths" = "deaths", 
-                  "Total Positive Cases" = "cases", 
-                  "Total Tests" = "totalTestResults", 
-                  "New Positive Cases" = "positiveIncrease")
+                  "Total Positive Cases" = "cases",
+                  "New Positive Cases" = "positiveIncrease",
+                  "Total Tests" = "totalTestResults"
+                  )
 
 policy.names <- c("Status of Reopening" = "reopening_status", 
                   "Restaurant Bans" = "restaurant_limits", 
@@ -106,7 +107,7 @@ server <- function(input, output, session) {
  #COVID stats tab   
     output$state_message <- renderText({
         paste0("State: ",
-               input$selected_state
+                input$selected_state
               )
     })
     
@@ -143,22 +144,6 @@ server <- function(input, output, session) {
             theme_classic()
     }
     
-  # testing graph 
-    else if (input$selected_variable == "totalTestResults") {
-        covid %>%
-            filter(state == input$selected_state) %>%
-            group_by(state) %>%
-             
-            ggplot(aes(x = date, y = totalTestResults)) +
-            geom_line(color = "#FB8500") +
-            labs(title = "COVID-19 New Daily Tests",
-                 x = "Date",
-                 y = "Number of New Tests") +
-        scale_y_continuous(labels = scales::comma) +
-        scale_x_date(date_breaks = "month", date_labels = "%b") +
-            theme_classic()
-    }
-  
     # positive Increase graph
     else if(input$selected_variable == "positiveIncrease") {
       covid %>%
@@ -174,6 +159,24 @@ server <- function(input, output, session) {
         scale_x_date(date_breaks = "month", date_labels = "%b") +
         theme_classic()
     }
+    
+  # testing graph 
+    else if (input$selected_variable == "totalTestResults") {
+        covid %>%
+            filter(state == input$selected_state) %>%
+            group_by(state) %>%
+             
+            ggplot(aes(x = date, y = totalTestResults)) +
+            geom_line(color = "#FB8500") +
+            labs(title = "COVID-19 Total Tests",
+                 x = "Date",
+                 y = "Number of New Tests") +
+        scale_y_continuous(labels = scales::comma) +
+        scale_x_date(date_breaks = "month", date_labels = "%b") +
+            theme_classic()
+    }
+  
+   
 })
   
 # Social Distancing Tab
@@ -182,7 +185,7 @@ server <- function(input, output, session) {
   output$policy_maps <- renderPlot({
     if(input$selected_policy == "reopening_status") {
       plot_usmap(data = map_policy, values = "reopening_status") +
-        theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain")) +
+        theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain"))+
         scale_fill_manual(name = "Policy", 
                           labels = c("New Restrictions Imposed", "Paused", "Proceeding with Reopening", "Reopened"), 
                           values = c("#8ECAE6", "#023047", "#219EBC", "#FFB703")) +
@@ -207,8 +210,8 @@ server <- function(input, output, session) {
         theme(legend.position = "bottom", plot.title = element_text(size = 15,
                                                                     face = "plain")) +
         scale_fill_manual(name = "Policy", 
-                          labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), 
-                          values = c("#FB8500", "#FE5F55", "#023047", "#FFB703", "#219EBC", "#E73462", "#8ECAE6")) +
+                          labels = c(">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings in Place"), 
+                          values = c("#FB8500", "#E73462", "#023047", "#FFB703", "#219EBC", "#8ECAE6")) +
         labs(title = "Current Large Gathering Ban Policies",
              caption = "Source: Kaiser Family Foundation")
     }
@@ -222,8 +225,8 @@ server <- function(input, output, session) {
               legend.title = element_text(size = 10), 
               legend.text = element_text(size = 6)) +
         scale_fill_manual(name = "Policy", 
-                          labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public", "Required for General Public"), 
-                          values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) + 
+                          labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public","Required for Certain Employees", "Required for General Public"), 
+                          values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#E73462", "#219EBC")) +
         labs(title = "Current Face Covering Requirements",
              caption = "Source: Kaiser Family Foundation")
     }

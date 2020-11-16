@@ -37,11 +37,43 @@ social_distancing <- read_rds()
 ```
 
 ```{r}
- map_restaurant <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+social_distancing_11_15 <- read_csv("data/social_distancing_11-15.csv", skip = 2,
+                              col_type = cols(Location = col_character(),
+                                              `Status of Reopening` = col_character(),
+                                              `Stay at Home Order` = col_character(),
+                                              `Mandatory Quarantine for Travelers` = col_character(),
+                                              `Non-Essential Business Closures` = col_character(),
+                                              `Large Gatherings Ban` = col_character(),
+                                              `Restaurant Limits` = col_character(),
+                                              `Bar Closures` = col_character(),
+                                              `Face Covering Requirement` = col_character(),
+                                              `Emergency Declaration` = col_character(),
+                                              Footnotes = col_character())) %>%
+    select(!Footnotes) %>%
+    slice(c(-1, -(53:92)))
+
+saveRDS(social_distancing_11_15, file = "socialdistancing_11_15.RDS")
+
+social_distancing_11_15 <- read_rds("socialdistancing_11_15.RDS")
+```
+
+
+```{r}
+#  map_restaurant <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+#   rename(restaurant_limits = `Restaurant Limits`) %>%
+#   select(fips, restaurant_limits)
+# 
+# plot_usmap(data = map_restaurant, values = "restaurant_limits") +
+#   theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain" )) +
+#   scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
+#   labs(title = "Current Restaurant Limit Policies",
+#        caption = "Source: Kaiser Family Foundation")
+
+map_restaurant_nov <- inner_join(social_distancing_11_15, statepop, by = c("Location" = "full")) %>%
   rename(restaurant_limits = `Restaurant Limits`) %>%
   select(fips, restaurant_limits)
 
-plot_usmap(data = map_restaurant, values = "restaurant_limits") +
+plot_usmap(data = map_restaurant_nov, values = "restaurant_limits") +
   theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain" )) +
   scale_fill_manual(name = "Policy", labels = c("No Data", "New Service Limits", "Reopened to Dine-in Service", "Reopened to Dine-in Service with Capacity Limits"), values = c("#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
   labs(title = "Current Restaurant Limit Policies",
@@ -51,44 +83,83 @@ plot_usmap(data = map_restaurant, values = "restaurant_limits") +
 ```
 
 ```{r}
- map_gathering <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+#  map_gathering <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+#   rename(gathering_ban = `Large Gatherings Ban`) %>%
+#   select(fips, gathering_ban)
+# 
+# plot_usmap(data = map_gathering, values = "gathering_ban") +
+#   theme(legend.position = "bottom", plot.title = element_text(size = 15,
+#                                                               face = "plain")) +
+#   scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#FB8500", "#FE5F55", "#023047", "#FFB703", "#219EBC", "#E73462", "#8ECAE6")) +
+#   labs(title = "Current Large Gathering Ban Policies",
+#        caption = "Source: Kaiser Family Foundation")
+
+map_gathering_nov <- inner_join(social_distancing_11_15, statepop, by = c("Location" = "full")) %>%
   rename(gathering_ban = `Large Gatherings Ban`) %>%
   select(fips, gathering_ban)
 
-plot_usmap(data = map_gathering, values = "gathering_ban") +
+plot_usmap(data = map_gathering_nov, values = "gathering_ban") +
   theme(legend.position = "bottom", plot.title = element_text(size = 15,
                                                               face = "plain")) +
-  scale_fill_manual(name = "Policy", labels = c("No Data", ">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings"), values = c("#FB8500", "#FE5F55", "#023047", "#FFB703", "#219EBC", "#E73462", "#8ECAE6")) +
+  scale_fill_manual(name = "Policy", labels = c(">10 People Prohibited", "All Gatherings Prohibited", "Expanded Limit to 25 or Fewer", "Expanded Limit to Greater Than 25", "Lifted", "New Limit on Large Gatherings in Place"), values = c("#FB8500", "#E73462", "#023047", "#FFB703", "#219EBC", "#8ECAE6")) +
   labs(title = "Current Large Gathering Ban Policies",
        caption = "Source: Kaiser Family Foundation")
 
 
 ```
-```{r}
- map_masks <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
-  rename(mask_req = `Face Covering Requirement`) %>%
-  select(fips, mask_req)
 
-plot_usmap(data = map_masks, values = "mask_req") +
+
+
+```{r}
+#  map_masks <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+#   rename(mask_req = `Face Covering Requirement`) %>%
+#   select(fips, mask_req)
+# 
+# plot_usmap(data = map_masks, values = "mask_req") +
+#   theme(legend.position = "bottom", 
+#         legend.direction = "horizontal", 
+#         plot.title = element_text(size = 15, face = "plain"), 
+#         legend.title = element_text(size = 10), 
+#         legend.text = element_text(size = 6)) +
+#    scale_fill_manual(name = "Policy", labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public", "Required for General Public"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
+#   labs(title = "Current Face Covering Requirements",
+#        caption = "Source: Kaiser Family Foundation")
+
+
+map_masks_nov <- inner_join(social_distancing_11_15, statepop, by = c("Location" = "full")) %>%
+  rename(mask_req = `Face Covering Requirement`) %>%
+  select(fips, mask_req) 
+
+plot_usmap(data = map_masks_nov, values = "mask_req") +
   theme(legend.position = "bottom", 
         legend.direction = "horizontal", 
         plot.title = element_text(size = 15, face = "plain"), 
         legend.title = element_text(size = 10), 
         legend.text = element_text(size = 6)) +
-   scale_fill_manual(name = "Policy", labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public", "Required for General Public"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#219EBC")) +
+   scale_fill_manual(name = "Policy", labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public","Required for Certain Employees", "Required for General Public"), values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#E73462", "#219EBC")) +
   labs(title = "Current Face Covering Requirements",
        caption = "Source: Kaiser Family Foundation")
 ```
 ```{r}
- map_reopening <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+#  map_reopening <- inner_join(social_distancing, statepop, by = c("Location" = "full")) %>%
+#   rename(reopening_status = `Status of Reopening`) %>%
+#   select(fips, reopening_status)
+# 
+# plot_usmap(data = map_reopening, values = "reopening_status") +
+#   theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain")) +
+#   scale_fill_manual(name = "Policy", 
+#                           labels = c("New Restrictions Imposed", "Paused", "Proceeding with Reopening", "Reopened"), 
+#                            values = c("#8ECAE6", "#023047", "#219EBC", "#FFB703")) +
+#   labs(title = "Current Status of Reopening",
+#        caption = "Source: Kaiser Family Foundation")
+
+map_reopening_nov <- inner_join(social_distancing_11_15, statepop, by = c("Location" = "full")) %>%
   rename(reopening_status = `Status of Reopening`) %>%
   select(fips, reopening_status)
 
-plot_usmap(data = map_reopening, values = "reopening_status") +
-  theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain")) +
-  scale_fill_manual(name = "Policy", 
-                          labels = c("New Restrictions Imposed", "Paused", "Proceeding with Reopening", "Reopened"), 
-                           values = c("#8ECAE6", "#023047", "#219EBC", "#FFB703")) +
+plot_usmap(data = map_reopening_nov, values = "reopening_status") +
+  theme(legend.position = "bottom", plot.title = element_text(size = 15, face = "plain"))+
+  scale_fill_manual(name = "Policy", labels = c("New Restrictions Imposed", "Paused", "Proceeding with Reopening", "Reopened"), values = c("#8ECAE6", "#023047", "#219EBC", "#FFB703")) +
   labs(title = "Current Status of Reopening",
        caption = "Source: Kaiser Family Foundation")
 
