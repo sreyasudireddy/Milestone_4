@@ -33,7 +33,6 @@ social_distancing <- read_csv("data/social_distancing.csv", skip = 2,
 
 saveRDS(social_distancing, file = "socialdistancing.RDS")
 
-social_distancing <- read_rds()
 ```
 
 ```{r}

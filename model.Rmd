@@ -1,0 +1,45 @@
+---
+title: "Model"
+author: "Sreya Sudireddy"
+date: "11/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(naniar)
+library(lubridate)
+library(tidyverse)
+```
+
+```{r}
+#Reading in covid data
+
+covid <- readRDS("coviddata.RDS") %>%
+  mutate(positiveIncrease = replace(positiveIncrease, which(positiveIncrease < 0), 0))
+  #mutate(totalTestResultsIncrease = replace(totalTestResultsIncrease, which(totalTestResultsIncrease < 0), 0))
+
+# Reading in social distancing data
+social_distancing_nov <- readRDS("socialdistancing_11_15.RDS") %>%
+  replace_with_na_all(condition = ~.x == "-") %>%
+  mutate(date = "2020-11-11") %>%
+  mutate(date = as.Date(date))
+
+social_distancing_oct <- readRDS("socialdistancing.RDS") %>%
+  replace_with_na_all(condition = ~.x == "-") %>%
+  mutate(date = "2020-10-20") %>%
+  mutate(date = as.Date(date))
+
+social_distancing_final <- bind_rows(social_distancing_nov, social_distancing_oct)
+
+#merging data for model
+model_dta <- full_join(covid, social_distancing_final, by = c("state"= "Location", "date"))
+
+
+```
+
+
+```{r}
+
+```
+
