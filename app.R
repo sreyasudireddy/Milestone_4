@@ -225,7 +225,7 @@ server <- function(input, output, session) {
               legend.title = element_text(size = 10), 
               legend.text = element_text(size = 6)) +
         scale_fill_manual(name = "Policy", 
-                          labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public","Required for Certain Employees", "Required for General Public"), 
+                          labels = c("No Data", "Allows Local Officials to \n Require for General Public", "Required for Certain \n Employees", "Required for Certain Employees; \n Allows Local Officials \n to Require for General Public","Required for Certain Employees; \n Required for General Public", "Required for General Public"), 
                           values = c("#FB8500", "#8ECAE6", "#023047", "#FFB703", "#E73462", "#219EBC")) +
         labs(title = "Current Face Covering Requirements",
              caption = "Source: Kaiser Family Foundation")

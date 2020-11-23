@@ -12,11 +12,11 @@ library(openintro)
 ```
 
 ```{r}
-covid_tracking <- read_csv("data/covid_11_12.csv") %>%
+covid_tracking <- read_csv("data/covid_11_23.csv") %>%
     filter(!state %in% c("AS", "PR", "GU", "VI", "MP")) %>%
   mutate(state = abbr2state(state))
 
-nyt_covid <- read_csv("data/us-states_11_12.csv") %>%
+nyt_covid <- read_csv("data/us-states_11_23.csv") %>%
     arrange(desc(date)) %>%
     filter(!fips %in% c(69, 72, 78, 66))
 
