@@ -364,12 +364,14 @@ output$covid_deaths_map <- renderPlot({
   # Positive increase graph
   output$positiveincrease <- renderPlot({
     ggplot(model_dta, aes(x = date, y = positive_increase, color = state)) +
-      geom_line()
+      geom_line() +
+      theme_classic() +
+      labs(x = "Date", y = "Number of New Positive Cases")
   })
   
   # Positive increase regression
   output$did_posincr <- renderDT({
-    posincr_model <- lm(positive_increase ~ time + treated + did + state,
+    lm(positive_increase ~ time + treated + did + state,
                         data = model_dta) %>%
       tidy(conf.int = TRUE) %>%
       select(term, estimate, p.value, conf.low, conf.high) %>%
@@ -382,7 +384,7 @@ output$covid_deaths_map <- renderPlot({
   
   # Testing increase regression
   output$did_tests <- renderDT({
-    testincr_model <- lm(total_test_results_increase ~ time + treated + did + state,
+   lm(total_test_results_increase ~ time + treated + did + state,
                          data = model_dta) %>%
       tidy(conf.int = TRUE) %>%
       select(term, estimate, p.value, conf.low, conf.high) %>%
@@ -395,7 +397,7 @@ output$covid_deaths_map <- renderPlot({
   
   # Deaths regression
   output$did_deaths <- renderDT({
-    deaths_model <- lm(deaths ~ time + treated + did + state,
+    lm(deaths ~ time + treated + did + state,
                        data = model_dta) %>%
       tidy(conf.int = TRUE) %>%
       select(term, estimate, p.value, conf.low, conf.high) %>%
