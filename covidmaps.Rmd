@@ -1,0 +1,46 @@
+---
+title: "Covid Maps"
+author: "Sreya Sudireddy"
+date: "11/29/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(shiny) 
+library(tidyverse)
+library(ggthemes)
+library(DT)
+library(shinythemes)
+library(usmap)
+library(choroplethr)
+library(choroplethrMaps)
+```
+
+```{r}
+coviddta <- covid <- readRDS("coviddata.RDS") %>%
+  mutate(positiveIncrease = replace(positiveIncrease, which(positiveIncrease < 0), 0))
+
+map_covid <- inner_join(covid_dta, statepop, by = c("state" = "full")) %>%
+  select(date, fips, cases, deaths, positiveIncrease) %>%
+  filter(date == "2020-11-22")
+
+
+```
+
+```{r}
+plot_usmap(data = map_covid, values = "cases") +
+  theme(legend.position = "right", plot.title = element_text(size = 15, face = "plain" )) +
+  scale_fill_continuous(name = "Number of Cases") +
+  labs(title = "Total COVID-19 Cases as of November 22nd, 2020",
+       caption = "Source: The New York Times")
+```
+```{r}
+plot_usmap(data = map_covid, values = "deaths") +
+  theme(legend.position = "right", plot.title = element_text(size = 15, face = "plain" )) +
+  scale_fill_continuous(type = "viridis", name = "Number of Deaths") +
+  labs(title = "Total COVID-19 Deaths as of November 22nd, 2020",
+       caption = "Source: The New York Times")
+```
+
+
