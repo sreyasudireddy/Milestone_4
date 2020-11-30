@@ -79,7 +79,7 @@ model_dta <- model_dta %>%
 model_dta <- model_dta %>%
   clean_names() %>%
   filter(state %in% c("Massachusetts", "Colorado", "New York")) %>%
-  mutate(time = case_when(date >= "2020-11-05" ~ 1,
+  mutate(time = case_when(date >= "2020-11-06" ~ 1,
                           TRUE ~ 0)) %>%
   mutate(treated = case_when(state == "Massachusetts" ~ 1,
                              TRUE ~ 0)) %>%

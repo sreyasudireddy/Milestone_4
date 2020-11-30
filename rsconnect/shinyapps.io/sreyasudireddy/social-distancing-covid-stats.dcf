@@ -5,8 +5,8 @@ account: sreyasudireddy
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3174764
-bundleId: 3924096
+bundleId: 3924962
 url: https://sreyasudireddy.shinyapps.io/social-distancing-covid-stats/
-when: 1606762432.26243
+when: 1606775953.96193
 asMultiple: FALSE
 asStatic: FALSE
