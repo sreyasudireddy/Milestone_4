@@ -90,13 +90,19 @@ saveRDS(model_dta, file = "model.RDS")
 
 
 ```{r}
-ggplot(mass, aes(x = date, y = positive_increase, color = state)) +
+  ggplot(model_dta, aes(x = date, y = positive_increase, color = state)) +
+      geom_line() +
+      scale_color_manual(name = "State", 
+                        labels = c("Colorado", "Massachusetts", "New York"),
+                        values = c("#ef476f", "#edae49", "#219EBC")) +
+      geom_vline(xintercept = as.numeric(as.Date("2020-11-05")), linetype = "dashed") +
+      theme_classic() +
+      labs(x = "Date", y = "Number of New Positive Cases") 
+
+ggplot(model_dta, aes(x = date, y = total_test_results_increase, color = state)) +
   geom_line()
 
-ggplot(mass, aes(x = date, y = total_test_results_increase, color = state)) +
-  geom_line()
-
-ggplot(mass, aes(x = date, y = deaths, color = state)) +
+ggplot(model_dta, aes(x = date, y = deaths, color = state)) +
   geom_line()
 ```
 
@@ -124,7 +130,12 @@ posincr_table <- posincr_model %>%
   rename(`Lower End` = conf.low) %>%
   rename(`Upper End` = conf.high) %>%
   rename(`P-Value` = p.value) %>%
-  filter(term %in% c("(Intercept)", "did"))
+  filter(term %in% c("(Intercept)", "did")) %>%
+  mutate(Coefficient = round(Coefficient, digits = 2)) %>%
+  mutate(`P-Value` = round(`P-Value`, digits = 2)) %>%
+  mutate(`Lower End` = round(`Lower End`, digits = 2)) %>%
+  mutate(`Upper End` = round(`Upper End`, digits = 2))
+posincr_table
 
 
 testincr_table <- lm(total_test_results_increase ~ time + treated + did + state,
@@ -164,88 +175,4 @@ deaths_table <- lm(deaths ~ time + treated + did + state,
 
 
 
-
-
-
-
-
-
-
-
-```{r}
-mask_model_lm <- lm(positive_increase ~ face_covering_requirement + state + date,
-                    data = model_mask_dta)
-summary(mask_model_lm)
-
-mask_model_cases_plm <- plm(cases ~ face_covering_requirement + state,
-                  index = "date",
-                 data = model_mask_dta)
-summary(mask_model_cases_plm)
-
-mask_model_posincr_plm <- plm(positive_increase ~ face_covering_requirement + state,
-                  index = "date",
-                 data = model_mask_dta)
-summary(mask_model_posincr_plm)
-
-
-mask_model_deaths_plm <- plm(deaths ~ face_covering_requirement + state,
-                  index = "date",
-                 data = model_mask_dta)
-summary(mask_model_deaths_plm)
-
-mask_model_tests_plm <- plm(total_test_results ~ face_covering_requirement + state,
-                  index = "date",
-                 data = model_mask_dta)
-summary(mask_model_tests_plm)
-
-mask_model_testsincr_plm <- plm(total_test_results_increase ~ face_covering_requirement + state,
-                  index = "date",
-                 data = model_mask_dta)
-summary(mask_model_testsincr_plm)
-
-```
-
-```{r}
-model_restaurant_dta <- model_dta %>%
-  clean_names() %>%
-  mutate(restaurant_limits = case_when(restaurant_limits == "-" ~ 0,
-                                       restaurant_limits == "New Service Limits" ~ 3,
-                                       restaurant_limits == "Reopened to Dine-in Service with Capacity Limits" ~ 2,
-                                       restaurant_limits == "Reopened to Dine-in Service" ~ 1)) %>%
-  mutate(restaurant_limits = as.factor(restaurant_limits)) %>%
-  select(date, state, cases, deaths, positive_increase, total_test_results, total_test_results_increase, restaurant_limits)
-
-```
-
-```{r}
-rest_model_lm <- lm(positive_increase ~ restaurant_limits + state + date,
-                    data = model_restaurant_dta)
-summary(rest_model_lm)
-
-rest_model_cases_plm <- plm(cases ~ restaurant_limits + state,
-                  index = "date",
-                 data = model_restaurant_dta)
-summary(rest_model_cases_plm)
-
-rest_model_posincr_plm <- plm(positive_increase ~ restaurant_limits + state,
-                  index = "date",
-                 data = model_restaurant_dta)
-summary(rest_model_posincr_plm)
-
-
-rest_model_deaths_plm <- plm(deaths ~ restaurant_limits + state,
-                  index = "date",
-                 data = model_restaurant_dta)
-summary(rest_model_deaths_plm)
-
-rest_model_tests_plm <- plm(total_test_results ~ restaurant_limits + state,
-                  index = "date",
-                 data = model_restaurant_dta)
-summary(rest_model_tests_plm)
-
-rest_model_testsincr_plm <- plm(total_test_results_increase ~ restaurant_limits + state,
-                  index = "date",
-                 data = model_restaurant_dta)
-summary(rest_model_testsincr_plm)
-```
 
