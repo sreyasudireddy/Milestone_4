@@ -31,12 +31,12 @@ social_distancing <- read_csv("data/social_distancing.csv", skip = 2,
     select(!Footnotes) %>%
     slice(c(-1, -(53:92)))
 
-saveRDS(social_distancing, file = "socialdistancing.RDS")
+saveRDS(social_distancing, file = "socialdistancing_10_20.RDS")
 
 ```
 
 ```{r}
-social_distancing_11_15 <- read_csv("data/social_distancing_11-15.csv", skip = 2,
+social_distancing_11_15 <- read_csv("data/social_distancing_11-11.csv", skip = 2,
                               col_type = cols(Location = col_character(),
                                               `Status of Reopening` = col_character(),
                                               `Stay at Home Order` = col_character(),
@@ -51,9 +51,9 @@ social_distancing_11_15 <- read_csv("data/social_distancing_11-15.csv", skip = 2
     select(!Footnotes) %>%
     slice(c(-1, -(53:92)))
 
-saveRDS(social_distancing_11_15, file = "socialdistancing_11_15.RDS")
+saveRDS(social_distancing_11_15, file = "socialdistancing_11_11.RDS")
 
-social_distancing_11_15 <- read_rds("socialdistancing_11_15.RDS")
+social_distancing_11_15 <- read_rds("socialdistancing_11_11.RDS")
 ```
 
 

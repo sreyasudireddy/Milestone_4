@@ -23,23 +23,21 @@ library(broom)
 ```{r}
 #Reading in covid data
 
-covid <- readRDS("coviddata.RDS") %>%
-  mutate(positiveIncrease = replace(positiveIncrease, which(positiveIncrease < 0), 0))
-  #mutate(totalTestResultsIncrease = replace(totalTestResultsIncrease, which(totalTestResultsIncrease < 0), 0))
+covid <- readRDS("coviddata.RDS") 
 
 # Reading in social distancing data
-social_distancing_nov <- readRDS("socialdistancing_11_15.RDS")
+social_distancing_nov <- readRDS("socialdistancing_11_11.RDS")
   #replace_with_na_all(condition = ~.x == "-") %>%
  # mutate(date = "2020-11-11") %>%
   # mutate(date = as.Date(date))
   
 covid_nov <- covid %>%
-  slice(1:612)
+  slice(1:1581)
 
 covid_oct <- covid %>%
-  slice(612:2703)
+  slice(1582:3417)
 
-social_distancing_oct <- readRDS("socialdistancing.RDS")
+social_distancing_oct <- readRDS("socialdistancing_10_20.RDS")
  # replace_with_na_all(condition = ~.x == "-") %>%
  # mutate(date = "2020-10-20") %>%
   # mutate(date = as.Date(date))
