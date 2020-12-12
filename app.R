@@ -197,8 +197,10 @@ ui <- navbarPage(
                between the states after the treatment date, and therefore the results of this regression may not 
                be very robust. Additionally, although the pre-trends for the total death rate are parallel, there
                is not much variation after the treatment date, therefore it is not hypothesized that the new 
-               social distancing policies have an affect on the total death rate. Nevertheless, for the daily 
-               positive case rate, which is the rate these policies are mostly aiming to contain, have relatively
+               social distancing policies have an effect on the total death rate. It is also important to note that
+               I used the log of deaths to conduct the regression since the numbers were quite high and could be the reason
+               why the trends graph does not show much of a difference after the treatment date. Nevertheless, for the daily 
+               positive case rate, which is the rate these policies are mostly aiming to contain, has relatively
                close parallel pre-trends and the positive case rate in Massachusetts rises but by not as much as 
                it does in Colorado and New York where new social distancing policies were not imposed by the treatment 
                date. Therefore, it is assumed that the new social distancing policies have an effect on containing 
@@ -210,13 +212,15 @@ ui <- navbarPage(
                p("There are some limitations to this model that must be considered: One is that this 
                diff-in-diff model is a simple model and contains no extra covariates. Other factors such as 
                income, population density, race, and gender can affect these COVID-19 outcomes and should be 
-               considered for a more robust model. Additionally, we are making the assumption that October and 
-               November social distancing policies apply for all the dates stated above, however in reality,
-               because each state determines its own policies and changes them on different dates, some of 
-               the assumed policy measures may not be very accurate. The KFF updates its data set as new 
-               data comes in and therefore it is difficult to pinpoint exactly when each state updated its
-               policies to get the most accurate dataset. Nevertheless, we can still use this data to assess
-               a baseline impact of social distancing policies on COVID-19 outcomes.")
+               considered for a more robust model. Also, testing data is not very reliable as the data source notes
+               that each state conducts testing differently and its reporting may not be entirely accurate. Nevertheless,
+               it is still safe to assume that the testing data is accurate enough for the scope of theis analysis.
+               Additionally, we are making the assumption that October and November social distancing policies apply 
+               for all the dates stated above, however in reality, because each state determines its own policies and 
+               changes them on different dates, some of the assumed policy measures may not be very accurate. 
+               The KFF updates its data set as new data comes in and therefore it is difficult to pinpoint exactly when
+               each state updated it policies to get the most accurate dataset. Nevertheless, we can still use this data 
+               to assess a baseline impact of social distancing policies on COVID-19 outcomes.")
                ),
               
               # tab to describe results of the model
@@ -249,7 +253,11 @@ ui <- navbarPage(
                  result is statistically significant at the 95% confidence level. Keep in mind that some people 
                  get tested regardless of the social distancing policies in place in their state or their health
                  status. Some reasons my include travel, precautionary measures, general curiosity, etc. Therefore, 
-                 it is difficult to isolate the effect of just the policies on the number of tests conducted. 
+                 it is difficult to isolate the effect of just the policies on the number of tests conducted. Additionally,
+                 the constant up and down trends in the graph could be due to the fact that some states do not conduct or report
+                 testing on a particular day and therefore the data is not entirely accurate for that single day. Further
+                 analysis can be done by looking at the effect of weekly administered test, however more weeks beyond the 
+                 scope of this analysis must be considred in order for there to be any confident interpretation.
                  Despite the result showing less tests being done in MA after the treatment compared to the other 
                  states, this could also just be that MA has a smaller population and therefore fewer tests 
                  would be conducted."),
@@ -258,13 +266,13 @@ ui <- navbarPage(
                  splitLayout(plotOutput("deaths"), cellWidths = c("75%", "75%"),
                              DTOutput("did_deaths")),
                  br(),
-                 p("The difference-in-differences coefficient is 39.59 The p-value is 0.6 This means that the 
-                 effect of the new social distancing policies in Massachusetts on the number of deaths is around
-                 39 deaths more than in the control states. Because the p-value is greater than 0.05, the result is
-                 not statistically significant. Many factors can contribute to the number of deaths, such as the 
-                 positive case rate, race, gender, pre-existing conditions, level of care,  hospitalizations, etc. 
-                 The result may be positive in this model, but after considering other factors, the result of the 
-                 diff-in-diff may vary both in the value of its coefficient and in its statistical significance.")
+                 p("The difference-in-differences coefficient is -0.06 The p-value is 0. This means that the 
+                 effect of the new social distancing policies in Massachusetts on the total number of deaths is around
+                 6% less than in the control states. Because the p-value is lower than 0.05, the result is
+                 statistically significant at the 95% confidence level. Many factors can contribute to the number 
+                 of deaths, such as the positive case rate, race, gender, pre-existing conditions, level of care, 
+                 hospitalizations, etc. After considering other factors, the result of the diff-in-diff may vary both 
+                 in the value of its coefficient and in its statistical significance.")
                )))
                )
              )),
@@ -603,7 +611,7 @@ output$covid_deaths_map <- renderPlot({
   
   # Deaths regression table
   output$did_deaths <- renderDT({
-    lm(deaths ~ time + treated + did + state,
+    lm(log(deaths) ~ time + treated + did + state,
                        data = model_dta) %>%
       tidy(conf.int = TRUE) %>%
       select(term, estimate, p.value, conf.low, conf.high) %>%

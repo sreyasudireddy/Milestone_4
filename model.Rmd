@@ -55,27 +55,6 @@ model_dta <- bind_rows(nov_dta, oct_dta)
 ```{r}
 model_dta <- model_dta %>%
   clean_names() %>%
-  mutate(face_covering_requirement = case_when(face_covering_requirement == "-" ~ 0,
-                                            face_covering_requirement == "Required for Certain Employees" ~ 1,
-                                          face_covering_requirement == "Allows Local Officials to Require for General Public" ~ 2,
-                                          face_covering_requirement == "Allows Local Officals to Require for General Public" ~ 2,
-                                          face_covering_requirement == "Required for Certain Employees; Allows Local Officials to Require for General Public" ~ 2,
-                                            face_covering_requirement == "Required for Certain Employees; Required for General Public" ~ 3,
-                                          face_covering_requirement == "Required for General Public" ~ 3)) %>%
-  mutate(face_covering_requirement = as.factor(face_covering_requirement)) %>%
-  mutate(restaurant_limits = case_when(restaurant_limits == "-" ~ 0,
-                                       restaurant_limits == "New Service Limits" ~ 3,
-                                       restaurant_limits == "Reopened to Dine-in Service with Capacity Limits" ~ 2,
-                                       restaurant_limits == "Reopened to Dine-in Service" ~ 1)) %>%
-  mutate(restaurant_limits = as.factor(restaurant_limits)) %>%
-  select(date, state, cases, deaths, positive_increase, total_test_results, total_test_results_increase, face_covering_requirement, restaurant_limits)
-
-```
-
-
-```{r}
-model_dta <- model_dta %>%
-  clean_names() %>%
   filter(state %in% c("Massachusetts", "Colorado", "New York")) %>%
   mutate(time = case_when(date >= "2020-11-06" ~ 1,
                           TRUE ~ 0)) %>%
@@ -114,7 +93,7 @@ testincr_model <- lm(total_test_results_increase ~ time + treated + did + state,
    data = model_dta)
   summary(testincr_model)
 
-deaths_model <- lm(deaths ~ time + treated + did + state,
+deaths_model <- lm(log(deaths) ~ time + treated + did + state,
    data = model_dta)
   summary(deaths_model)
 ```
